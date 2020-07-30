@@ -45,11 +45,9 @@ pub trait Matrix<T: Element>: Index<usize> + IndexMut<usize> {
     /// returns the number of columns in the matrix
     fn columns(&self) -> usize;
 
-    /// Return iterator over matrix
-    fn iter(&self) -> NormMatrixIterator<T>;
-
     /// Creates a new matrix with default values
     fn new(rows: usize, columns: usize) -> Self;
+
 }
 
 /// Matrix struct.  Contains the data stored in a one-dimension vector, and values for rows and columns.
@@ -66,15 +64,28 @@ pub struct NormMatrixIterator<'a, T: Element> {
     index: usize,
 }
 
-impl<'a, I: Element> Iterator for NormMatrixIterator<'a, I> {
-    type Item = I;
-    fn next(&mut self) -> Option<Self::Item> {
+impl <T: Element> NormMatrix<T> {
+    fn iter(&self) -> NormMatrixIterator<T> {
+        NormMatrixIterator {
+            matrix_ref: self,
+            index: 0,
+        }
+    }
+}
+
+// pub trait MatrixIterator: Iterator {}
+// impl <T: Element> MatrixIterator for  NormMatrixIterator<'_, T> {}
+
+impl <T: Element> Iterator for NormMatrixIterator<'_, T> {
+    type Item = T;
+    fn next(&mut self) -> Option<T>{
         self.index += 1;
         match self.matrix_ref.cells.get(self.index - 1) {
             None => None,
             Some(v) => Some(*v),
         }
     }
+    
 }
 
 impl<T: Element> Index<usize> for NormMatrix<T> {
@@ -141,13 +152,6 @@ impl<T: Element + 'static> Matrix<T> for NormMatrix<T> {
             m_columns: self.columns(),
             cells: new_cells,
         })
-    }
-
-    fn iter(&self) -> NormMatrixIterator<T> {
-        NormMatrixIterator {
-            matrix_ref: self,
-            index: 0,
-        }
     }
 
     fn rows(&self) -> usize {
@@ -433,7 +437,22 @@ mod tests {
         assert_eq!(result.get(0,0), Some(6));
         assert_eq!(result.get(1,0), Some(6));
         assert_eq!(result.get(2,0), Some(6));
-
-
     }
+
+    #[test]
+    fn iter_test2 () {
+        let a: NormMatrix<i32> = NormMatrix::new(3,3).set_slice(0,0,&[1, 2, 3, 4, 5, 6, 7, 8, 9]).unwrap();
+        let mut iter = a.iter();
+        assert_eq!(iter.next(), Some(1));
+        assert_eq!(iter.next(), Some(2));
+        assert_eq!(iter.next(), Some(3));
+        assert_eq!(iter.next(), Some(4));
+        assert_eq!(iter.next(), Some(5));
+        assert_eq!(iter.next(), Some(6));
+        assert_eq!(iter.next(), Some(7));
+        assert_eq!(iter.next(), Some(8));
+        assert_eq!(iter.next(), Some(9));
+        assert_eq!(iter.next(), None);
+    }
+
 }
