@@ -1,7 +1,8 @@
 
-use matrix::{Mat, MatrixError, MutVecRow, Matrix};
+use matrix::{Mat, Matrix};
 use std::ops::{Add, Sub, Mul, Div};
 use num_traits::{FromPrimitive, Zero};
+use std::error::Error;
 extern crate matrix;
 
 
@@ -168,6 +169,11 @@ fn transpose<M: Mat<T>, T: Default + Copy>(x: &M) -> M {
     to_return
 }
 
+enum MatrixError {
+    SizeError
+}
+impl Error for MatrixError{}
+
 /// Multiplies two matrices together
 /// returns product of the two matrices.
 /// # Example
@@ -198,6 +204,11 @@ pub fn multiply<M: Mat<T> + std::fmt::Debug, T: Default + Copy + Add<Output = T>
     lhs: &M,
     rhs: &M,
 ) -> Result<M, MatrixError> {
+
+    // Number of lhs columns need to equal number of rhs rows
+    if lhs.columns() != rhs.rows() {
+        return MatrixError::SizeError;
+    }
     let row = lhs.rows();
     let col = rhs.columns();
 
@@ -208,16 +219,12 @@ pub fn multiply<M: Mat<T> + std::fmt::Debug, T: Default + Copy + Add<Output = T>
     for i in 0..row {
         for j in 0..col {
             for k in 0..lhs.columns() {
-                if result.get(i,j)?.is_none() && 
-                    lhs.get(i,k)?.is_none()&&
-                    rhs.get(k,j)?.is_none() {
-                        continue;
-                    } 
-                *result.at(i,j)? = Some(result.get(i,j)?.unwrap_or_else(||T::default()) + lhs.get(i,k)?.unwrap_or_else(||T::default()) * rhs.get(k,j)?.unwrap_or_else(||T::default()));
+                let val = result.get(i,j).unwrap() + lhs.get(i,k).unwrap() * rhs.get(k,j).unwrap();
+                result.set(i,j, val);
             }
         }
     }
-    println!("{:?}", result);
+    //println!("{:?}", result);
     Ok(result)
 }
 
