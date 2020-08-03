@@ -1,9 +1,11 @@
 use std::ops::{Index, IndexMut};
 
-mod element;
-mod norm_matrix;
-use element::Element;
-use norm_matrix::NormMatrix;
+pub mod element;
+pub mod norm_matrix;
+pub mod norm_operations;
+// pub mod gaus_elim_steps;
+pub use self::element::Element;
+pub use self::norm_matrix::NormMatrix;
 
 /// The Mat trait is used for Matrix types.  It contains basic set and get functions to manipulate data,
 /// along with a set_slice function to set a certain length, or all, of the matrix using an array or vector.
@@ -28,18 +30,16 @@ pub trait Matrix<T: Element>: Index<usize> + IndexMut<usize> {
 
     /// Creates a new matrix with default values
     fn new(rows: usize, columns: usize) -> Self;
-
 }
-
-
 
 #[cfg(test)]
 mod tests {
 
     use super::*;
     fn setup() -> NormMatrix<f64> {
-        NormMatrix::new(3, 2).set_slice(0, 0, &[0.0, 3.0, 1.0, -2.0, 2.0, 1.0]).unwrap()
-        
+        NormMatrix::new(3, 2)
+            .set_slice(0, 0, &[0.0, 3.0, 1.0, -2.0, 2.0, 1.0])
+            .unwrap()
     }
 
     #[test]
@@ -65,8 +65,10 @@ mod tests {
 
     #[test]
     fn set_slice_test() {
-        let v: NormMatrix<i32> = NormMatrix::new(5, 3).set_slice(0, 0, &[1, 2, 3, 4]).unwrap();
-    
+        let v: NormMatrix<i32> = NormMatrix::new(5, 3)
+            .set_slice(0, 0, &[1, 2, 3, 4])
+            .unwrap();
+
         assert_eq!(v.get(0, 0), Some(1));
         assert_eq!(v.get(0, 1), Some(2));
         assert_eq!(v.get(0, 2), Some(3));
@@ -123,8 +125,12 @@ mod tests {
     }
     #[test]
     fn add_test() {
-        let v1: NormMatrix<i32> = NormMatrix::new(3, 2).set_slice(0, 0, &[1, 2, 3, 4, 5, 6]).unwrap();
-        let v2: NormMatrix<i32> = NormMatrix::new(3, 2).set_slice(0, 0, &[0, 2, 4, 6, 8, 10]).unwrap();
+        let v1: NormMatrix<i32> = NormMatrix::new(3, 2)
+            .set_slice(0, 0, &[1, 2, 3, 4, 5, 6])
+            .unwrap();
+        let v2: NormMatrix<i32> = NormMatrix::new(3, 2)
+            .set_slice(0, 0, &[0, 2, 4, 6, 8, 10])
+            .unwrap();
 
         let v3 = &v1 + &v2;
         assert_eq!(v3.get(0, 0), Some(1));
@@ -156,31 +162,35 @@ mod tests {
 
     #[test]
     fn multiply_test() {
-        let a: NormMatrix<i32> = NormMatrix::new(3,3).set_slice(0,0,&[1, 1, 1, 1, 1, 1, 1, 1, 1]).unwrap();
-        let b: NormMatrix<i32> = NormMatrix::new (3,1).set_slice(0,0,&[2,2,2]).unwrap();
-        
+        let a: NormMatrix<i32> = NormMatrix::new(3, 3)
+            .set_slice(0, 0, &[1, 1, 1, 1, 1, 1, 1, 1, 1])
+            .unwrap();
+        let b: NormMatrix<i32> = NormMatrix::new(3, 1).set_slice(0, 0, &[2, 2, 2]).unwrap();
+
         let result = &a * &b;
 
         assert_eq!(result.rows(), 3);
         assert_eq!(result.columns(), 1);
 
-        assert_eq!(result.get(0,0), Some(6));
-        assert_eq!(result.get(1,0), Some(6));
-        assert_eq!(result.get(2,0), Some(6));
+        assert_eq!(result.get(0, 0), Some(6));
+        assert_eq!(result.get(1, 0), Some(6));
+        assert_eq!(result.get(2, 0), Some(6));
 
         let result = a * b;
 
         assert_eq!(result.rows(), 3);
         assert_eq!(result.columns(), 1);
 
-        assert_eq!(result.get(0,0), Some(6));
-        assert_eq!(result.get(1,0), Some(6));
-        assert_eq!(result.get(2,0), Some(6));
+        assert_eq!(result.get(0, 0), Some(6));
+        assert_eq!(result.get(1, 0), Some(6));
+        assert_eq!(result.get(2, 0), Some(6));
     }
 
     #[test]
-    fn iter_test2 () {
-        let a: NormMatrix<i32> = NormMatrix::new(3,3).set_slice(0,0,&[1, 2, 3, 4, 5, 6, 7, 8, 9]).unwrap();
+    fn iter_test2() {
+        let a: NormMatrix<i32> = NormMatrix::new(3, 3)
+            .set_slice(0, 0, &[1, 2, 3, 4, 5, 6, 7, 8, 9])
+            .unwrap();
         let mut iter = a.iter();
         assert_eq!(iter.next(), Some(1));
         assert_eq!(iter.next(), Some(2));
@@ -193,5 +203,4 @@ mod tests {
         assert_eq!(iter.next(), Some(9));
         assert_eq!(iter.next(), None);
     }
-
 }

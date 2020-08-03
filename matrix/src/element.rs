@@ -1,6 +1,19 @@
+use num_traits::{One, Zero};
 /// Trait that incorporates other traits that are needed for proper matrix operations.
-use std::ops::{Add, Mul};
-pub trait Element: Default + Copy + Clone + Add<Output = Self> + Mul<Output = Self> {}
+use std::ops::{Add, Div, Mul, Sub};
+pub trait Element:
+    Default
+    + Copy
+    + Clone
+    + Add<Output = Self>
+    + Mul<Output = Self>
+    + One
+    + Zero
+    + PartialOrd
+    + Sub<Output = Self>
+    + Div<Output = Self>
+{
+}
 macro_rules! implement(
     ($name:ty) => (
         impl Element for $name {}
