@@ -11,26 +11,43 @@ pub trait Element:
     + Zero
     + PartialOrd
     + Sub<Output = Self>
-    + Div<Output = Self>
+  // Div trait not used due to integer division.
 {
 }
-macro_rules! implement(
+macro_rules! implementElement(
     ($name:ty) => (
         impl Element for $name {}
     );
 );
-implement!(u8);
-implement!(u16);
-implement!(u32);
-implement!(u64);
 
-implement!(i8);
-implement!(i16);
-implement!(i32);
-implement!(i64);
+pub trait FloatElement:
+Element
++ Div<Output = Self>
+{
+}
+macro_rules! implementFloatElement(
+    ($name:ty) => (
+        impl FloatElement for $name {}
+    );
+);
 
-implement!(f32);
-implement!(f64);
+implementFloatElement!(f32);
+implementFloatElement!(f64);
 
-implement!(isize);
-implement!(usize);
+implementElement!(u8);
+implementElement!(u16);
+implementElement!(u32);
+implementElement!(u64);
+
+implementElement!(i8);
+implementElement!(i16);
+implementElement!(i32);
+implementElement!(i64);
+
+implementElement!(f32);
+implementElement!(f64);
+
+implementElement!(isize);
+implementElement!(usize);
+
+

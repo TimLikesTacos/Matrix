@@ -1,4 +1,4 @@
-use crate::element::Element;
+use crate::element::{Element, FloatElement};
 use crate::norm_operations::{Augment, GaussianEliminateSteps, Transpose};
 use crate::Matrix;
 use std::ops::{Add, Index, IndexMut, Mul};
@@ -283,7 +283,7 @@ impl<T: Element + 'static> Transpose<T> for NormMatrix<T> {
     }
 }
 
-impl<T: Element + 'static> GaussianEliminateSteps<T> for NormMatrix<T> {
+impl<T: FloatElement + 'static> GaussianEliminateSteps<T> for NormMatrix<T> {
     fn pivot(&mut self, row: usize) {
 
         fn swap<T2: Element>(
